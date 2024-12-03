@@ -7,7 +7,6 @@ import { User } from './user.model';
 import { generatedStudentId } from './user.utils';
 
 const createStudentIntoDB = async (password: string, payload: TStudent) => {
-  console.log(payload);
   // create a user object:
   const userData: Partial<TUser> = {};
   // if password is not given set default password:
@@ -20,8 +19,11 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   const admissionSemester = await AcademicSemester.findById(
     payload.admissionSemester,
   );
-  console.log(admissionSemester);
-
+  if (!admissionSemester) {
+    throw new Error(
+      `Academic Semester with ID ${payload.admissionSemester} not found.`,
+    );
+  }
   // set generated id:
   userData.id = await generatedStudentId(admissionSemester);
   const newUser = await User.create(userData);
