@@ -46,7 +46,7 @@ const updateAcademicSemester = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: 'Academic Semesteris updated successfully',
+    message: 'Academic Semester is updated successfully',
     data: result,
   });
 });
@@ -57,7 +57,7 @@ const deleteAcademicSemester = catchAsync(async (req, res) => {
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
-    message: 'Academic Semester is retrieved successfully',
+    message: 'Academic Semester is deleted successfully',
     data: result,
   });
 });
