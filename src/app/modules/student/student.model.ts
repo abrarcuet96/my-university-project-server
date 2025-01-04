@@ -75,7 +75,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       type: String,
       unique: true,
       required: [true, 'Student ID is required'],
-      maxlength: [20, 'Password can not be more that 20 characters'],
     },
     user: {
       type: Schema.Types.ObjectId,
@@ -146,6 +145,10 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       type: Boolean,
       default: false,
     },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepartment',
+    },
   },
   {
     toJSON: {
@@ -153,11 +156,21 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     },
   },
 );
-
+// virtual
+studentSchema.virtual('firstName').get(function () {
+  return this?.name?.firstName + this?.name?.middleName + this?.name?.lastName;
+});
 // creating a custom static method
 studentSchema.statics.isUserExist = async function (id: string) {
   const existingUser = await Student.findOne({ id });
   return existingUser;
 };
-
+studentSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+studentSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
 export const Student = model<TStudent, StudentModel>('Student', studentSchema);

@@ -1,4 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { StatusCodes } from 'http-status-codes';
+import mongoose from 'mongoose';
 import config from '../../config';
+import AppError from '../../errors/AppError';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
@@ -19,22 +23,43 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   const admissionSemester = await AcademicSemester.findById(
     payload.admissionSemester,
   );
-  if (!admissionSemester) {
-    throw new Error(
-      `Academic Semester with ID ${payload.admissionSemester} not found.`,
-    );
-  }
-  // set generated id:
-  userData.id = await generatedStudentId(admissionSemester);
-  const newUser = await User.create(userData);
 
-  //   create a student if user exist:
-  if (Object.keys(newUser).length) {
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+    if (!admissionSemester) {
+      throw new AppError(
+        StatusCodes.NOT_FOUND,
+        `Academic Semester with ID ${payload.admissionSemester} not found.`,
+      );
+    }
+    // set generated id:
+    userData.id = await generatedStudentId(admissionSemester);
+
+    // create a user(transaction-1)
+    const newUser = await User.create([userData], { session });
+
+    //   create a student if user exist:
+    if (!newUser.length) {
+      throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create user');
+    }
     // set id, _id as user:
-    payload.id = newUser.id;
-    payload.user = newUser._id; //reference _id
-    const newStudent = await Student.create(payload);
+    payload.id = newUser[0].id;
+    payload.user = newUser[0]._id; //reference _id
+
+    // create a student(transaction-2)
+    const newStudent = await Student.create([payload], { session });
+    if (!newStudent) {
+      throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create student');
+    }
+    await session.commitTransaction();
+    await session.endSession();
     return newStudent;
+  } catch (err: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(err);
   }
 };
 export const UserServices = {

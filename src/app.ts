@@ -9,7 +9,10 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/api/v1', router);
-
+// const test = async (req: Request, res: Response) => {
+//   Promise.reject();
+// };
+// app.get('/', test);
 // error handler:
 app.use(globalErrorHandler);
 app.use(notFound);
