@@ -71,6 +71,8 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
   }
 };
 const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
+  console.log(payload);
+
   const userData: Partial<TUser> = {};
   userData.password = password || (config.default_pass as string);
   userData.role = 'faculty';

@@ -75,7 +75,7 @@ const updateLocalGuardianValidationSchema = z.object({
 });
 
 // Main Student ValidationValidationSchema
-const createStudentValidationSchema = z.object({
+export const createStudentValidationSchema = z.object({
   body: z.object({
     password: z.string().max(20),
     student: z.object({

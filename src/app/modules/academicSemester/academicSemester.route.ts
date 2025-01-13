@@ -13,20 +13,14 @@ router.post(
   AcademicSemesterControllers.createAcademicSemester,
 );
 router.patch(
-  '/:academicSemesterId',
+  '/:id',
   validateRequest(
     AcademicSemesterValidation.updateAcademicSemesterValidationSchema,
   ),
   AcademicSemesterControllers.updateAcademicSemester,
 );
-router.delete(
-  '/:academicSemesterId',
-  AcademicSemesterControllers.deleteAcademicSemester,
-);
-router.get(
-  '/:academicSemesterId',
-  AcademicSemesterControllers.getSingleAcademicSemester,
-);
+router.delete('/:id', AcademicSemesterControllers.deleteAcademicSemester);
+router.get('/:id', AcademicSemesterControllers.getSingleAcademicSemester);
 router.get('/', AcademicSemesterControllers.getAllAcademicSemesters);
 
 export const AcademicSemesterRoutes = router;

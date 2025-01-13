@@ -32,7 +32,7 @@ const updateAcademicSemester = async (
   ) {
     throw new AppError(StatusCodes.NOT_FOUND, 'Invalid semester code');
   }
-  const result = await AcademicSemester.findOneAndUpdate({ id: id }, payload, {
+  const result = await AcademicSemester.findByIdAndUpdate(id, payload, {
     new: true,
   });
   return result;

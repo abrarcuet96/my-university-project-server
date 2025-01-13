@@ -15,11 +15,9 @@ const createAcademicSemester = catchAsync(async (req, res) => {
   });
 });
 const getSingleAcademicSemester = catchAsync(async (req, res) => {
-  const { academicSemesterId } = req.params;
+  const { id } = req.params;
   const result =
-    await AcademicSemesterServices.getSingleAcademicSemesterFromDB(
-      academicSemesterId,
-    );
+    await AcademicSemesterServices.getSingleAcademicSemesterFromDB(id);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
@@ -37,10 +35,10 @@ const getAllAcademicSemesters = catchAsync(async (req, res) => {
   });
 });
 const updateAcademicSemester = catchAsync(async (req, res) => {
-  const { academicSemesterId } = req.params;
+  const { id } = req.params;
   const body = req.body;
   const result = await AcademicSemesterServices.updateAcademicSemester(
-    academicSemesterId,
+    id,
     body,
   );
   sendResponse(res, {
@@ -51,9 +49,8 @@ const updateAcademicSemester = catchAsync(async (req, res) => {
   });
 });
 const deleteAcademicSemester = catchAsync(async (req, res) => {
-  const { academicSemesterId } = req.params;
-  const result =
-    await AcademicSemesterServices.deleteAcademicSemester(academicSemesterId);
+  const { id } = req.params;
+  const result = await AcademicSemesterServices.deleteAcademicSemester(id);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
