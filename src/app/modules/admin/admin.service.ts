@@ -38,7 +38,7 @@ const updateAdminIntoDB = async (id: string, payload: Partial<TAdmin>) => {
     }
   }
 
-  const result = await Admin.findByIdAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Admin.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
@@ -64,7 +64,7 @@ const deleteAdminFromDB = async (id: string) => {
     // get user _id from deletedAdmin
     const userId = deletedAdmin.user;
 
-    const deletedUser = await User.findOneAndUpdate(
+    const deletedUser = await User.findByIdAndUpdate(
       userId,
       { isDeleted: true },
       { new: true, session },
