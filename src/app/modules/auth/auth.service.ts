@@ -8,7 +8,7 @@ import AppError from '../../errors/AppError';
 import { senedEmail } from '../../utils/sendEmail';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
-import { createToken } from './auth.utils';
+import { createToken, verifyToken } from './auth.utils';
 const loginUser = async (payload: TLoginUser) => {
   //   checking if the user is exist
   const user = await User.isUserExistsByCustomId(payload.id);
@@ -187,10 +187,7 @@ const resetPassword = async (
     throw new AppError(StatusCodes.FORBIDDEN, 'This user is blocked!');
   }
   // check if the token is valid:
-  const decoded = jwt.verify(
-    token,
-    config.jwt_access_secret as string,
-  ) as JwtPayload;
+  const decoded = verifyToken(token, config.jwt_refresh_secret as string);
   if (userId !== decoded.userId) {
     throw new AppError(StatusCodes.FORBIDDEN, 'You are forbidden!');
   }
