@@ -32,6 +32,7 @@ const getSingleCourseFromDB = async (id: string) => {
 
   return result;
 };
+
 const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
   const { preRequisiteCourses, ...courseRemainingData } = payload;
   const session = await mongoose.startSession();
@@ -127,6 +128,13 @@ const assignFacultiesWithCourseIntoDB = async (
   );
   return result;
 };
+const getFacultiesWithCourseFromDB = async (courseId: string) => {
+  const result = await CourseFaculty.findOne({ course: courseId }).populate(
+    'faculties',
+  );
+
+  return result;
+};
 const removeFacultiesFromCourseFromDB = async (
   id: string,
   payload: Partial<TcourseFaculty>,
@@ -155,4 +163,5 @@ export const CourseServices = {
   updateCourseIntoDB,
   assignFacultiesWithCourseIntoDB,
   removeFacultiesFromCourseFromDB,
+  getFacultiesWithCourseFromDB,
 };

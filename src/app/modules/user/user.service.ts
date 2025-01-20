@@ -38,6 +38,17 @@ const createStudentIntoDB = async (
   const admissionSemester = await AcademicSemester.findById(
     payload.admissionSemester,
   );
+  if (!admissionSemester) {
+    throw new AppError(StatusCodes.NOT_FOUND, `Admission Semester not found.`);
+  }
+  // find Academic Department info:
+  const academicDepartment = await AcademicDepartment.findById(
+    payload.academicDepartment,
+  );
+  if (!academicDepartment) {
+    throw new AppError(StatusCodes.NOT_FOUND, `Academic Department not found.`);
+  }
+  payload.academicFaculty = academicDepartment.academicFaculty;
 
   const session = await mongoose.startSession();
 
@@ -52,11 +63,13 @@ const createStudentIntoDB = async (
     // set generated id:
     userData.id = await generatedStudentId(admissionSemester);
     // send image to cloudinary
-    const imageName = `${userData.id}${payload?.name?.firstName}`;
-    const path = file?.path;
-    const { secure_url } = (await sendImageToCloudinary(imageName, path)) as {
-      secure_url: string;
-    };
+    if (file) {
+      const imageName = `${userData.id}${payload?.name?.firstName}`;
+      const path = file?.path;
+      const { secure_url } = await sendImageToCloudinary(imageName, path);
+      payload.profileImage = secure_url as string;
+    }
+
     // create a user(transaction-1)
     const newUser = await User.create([userData], { session });
 
@@ -67,7 +80,6 @@ const createStudentIntoDB = async (
     // set id, _id as user:
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id; //reference _id
-    payload.profileImage = secure_url;
 
     // create a student(transaction-2)
     const newStudent = await Student.create([payload], { session });
@@ -100,23 +112,24 @@ const createFacultyIntoDB = async (
   if (!academicDepartment) {
     throw new AppError(400, 'Academic department not found');
   }
+  payload.academicFaculty = academicDepartment.academicFaculty;
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
     userData.id = await generateFacultyId();
     // send image to cloudinary
-    const imageName = `${userData.id}${payload?.name?.firstName}`;
-    const path = file?.path;
-    const { secure_url } = (await sendImageToCloudinary(imageName, path)) as {
-      secure_url: string;
-    };
+    if (file) {
+      const imageName = `${userData.id}${payload?.name?.firstName}`;
+      const path = file?.path;
+      const { secure_url } = await sendImageToCloudinary(imageName, path);
+      payload.profileImg = secure_url as string;
+    }
     const newUser = await User.create([userData], { session });
     if (!newUser.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create user');
     }
     payload.id = newUser[0].id;
     payload.user = newUser[0]._id;
-    payload.profileImg = secure_url;
     const newFaculty = await Faculty.create([payload], { session });
     if (!newFaculty.length) {
       throw new AppError(StatusCodes.BAD_REQUEST, 'Failed to create faculty');
@@ -152,11 +165,12 @@ const createAdminIntoDB = async (
     //set  generated id
     userData.id = await generateAdminId();
     // send image to cloudinary
-    const imageName = `${userData.id}${payload?.name?.firstName}`;
-    const path = file?.path;
-    const { secure_url } = (await sendImageToCloudinary(imageName, path)) as {
-      secure_url: string;
-    };
+    if (file) {
+      const imageName = `${userData.id}${payload?.name?.firstName}`;
+      const path = file?.path;
+      const { secure_url } = await sendImageToCloudinary(imageName, path);
+      payload.profileImg = secure_url as string;
+    }
     // create a user (transaction-1)
     const newUser = await User.create([userData], { session });
 
@@ -166,8 +180,8 @@ const createAdminIntoDB = async (
     }
     // set id , _id as user
     payload.id = newUser[0].id;
-    payload.user = newUser[0]._id; //reference _id
-    payload.profileImg = secure_url;
+    payload.user = newUser[0]._id;
+
     // create a admin (transaction-2)
     const newAdmin = await Admin.create([payload], { session });
 

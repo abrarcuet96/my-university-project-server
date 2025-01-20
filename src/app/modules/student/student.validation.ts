@@ -100,8 +100,8 @@ export const createStudentValidationSchema = z.object({
       permanentAddress: z.string().min(1, 'Permanent address is required'),
       guardian: createGuardianValidationSchema,
       localGuardian: createLocalGuardianValidationSchema,
-      // profileImage: z.string().optional(),
       admissionSemester: z.string(),
+      academicDeparment: z.string(),
     }),
   }),
 });
@@ -140,8 +140,8 @@ const updateStudentValidationSchema = z.object({
         .optional(),
       guardian: updateGuardianValidationSchema.optional(),
       localGuardian: updateLocalGuardianValidationSchema.optional(),
-      profileImage: z.string().optional(),
       admissionSemester: z.string().optional(),
+      academicDeparment: z.string().optional(),
     }),
   }),
 });
