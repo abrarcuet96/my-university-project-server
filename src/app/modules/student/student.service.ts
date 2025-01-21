@@ -12,12 +12,7 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
     Student.find()
       .populate('user')
       .populate('admissionSemester')
-      .populate({
-        path: 'academicDepartment',
-        populate: {
-          path: 'academicFaculty',
-        },
-      }),
+      .populate('academicDepartment academicFaculty'),
     query,
   )
     .search(studentsSearchableFields)
@@ -25,9 +20,14 @@ const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
     .sort()
     .paginate()
     .fields();
-  const result = await studentQuery.modelQuery;
+
   const meta = await studentQuery.countTotal();
-  return { meta, result };
+  const result = await studentQuery.modelQuery;
+
+  return {
+    meta,
+    result,
+  };
 };
 const getSingleStudentsFromDB = async (id: string) => {
   const result = await Student.findById(id)

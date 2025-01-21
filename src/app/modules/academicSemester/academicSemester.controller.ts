@@ -26,12 +26,15 @@ const getSingleAcademicSemester = catchAsync(async (req, res) => {
   });
 });
 const getAllAcademicSemesters = catchAsync(async (req, res) => {
-  const result = await AcademicSemesterServices.getAllAcademicSemestersFromDB();
+  const result = await AcademicSemesterServices.getAllAcademicSemestersFromDB(
+    req.query,
+  );
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
     message: 'Academic Semesters are retrieved successfully',
-    data: result,
+    meta: result.meta,
+    data: result.result,
   });
 });
 const updateAcademicSemester = catchAsync(async (req, res) => {

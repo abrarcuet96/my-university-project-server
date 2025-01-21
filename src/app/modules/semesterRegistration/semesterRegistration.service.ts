@@ -53,7 +53,7 @@ const createSemesterRegistrationIntoDB = async (
 const getAllSemesterRegistrationsFromDB = async (
   query: Record<string, unknown>,
 ) => {
-  const semesterregistrationQuery = new QueryBuilder(
+  const semesterRegistrationQuery = new QueryBuilder(
     SemesterRegistration.find().populate('academicSemester'),
     query,
   )
@@ -61,8 +61,13 @@ const getAllSemesterRegistrationsFromDB = async (
     .sort()
     .paginate()
     .fields();
-  const result = await semesterregistrationQuery.modelQuery;
-  return result;
+
+  const result = await semesterRegistrationQuery.modelQuery;
+  const meta = await semesterRegistrationQuery.countTotal();
+  return {
+    result,
+    meta,
+  };
 };
 const getSingleSemesterRegistrationsFromDB = async (id: string) => {
   const result = await SemesterRegistration.findById(id);
